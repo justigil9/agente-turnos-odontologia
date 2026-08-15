@@ -1,0 +1,419 @@
+{
+  "name": "AGENTE DE TURNOS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "147fe6d2-7e99-4645-9b10-2ce8742ade25",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "54fe8829-817d-4ac2-aebc-ac428a608824",
+      "name": "Webhook",
+      "webhookId": "147fe6d2-7e99-4645-9b10-2ce8742ade25"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-api-key",
+              "value": "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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-6\",\n  \"max_tokens\": 400,\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Sos un asistente de un consultorio odontológico. Analizá el siguiente mensaje de un paciente y respondé SOLO con un JSON (sin texto adicional) con esta estructura exacta: {\\\"tipo_consulta\\\": \\\"Limpieza|Control|Urgencia|Extracción|Ortodoncia|Blanqueamiento|Otro\\\", \\\"fecha_hora_solicitada\\\": \\\"texto tal cual lo pidió el paciente\\\", \\\"resumen\\\": \\\"resumen breve en una linea\\\"}. Mensaje del paciente: {{ $json.body.mensaje_original }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "96fe369c-dae6-4525-a329-fa6e1eb86545",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $input.first().json.content[0].text;\nconst cleaned = rawText.replace(/```json|```/g, '').trim();\nconst parsed = JSON.parse(cleaned);\n\nreturn [\n  {\n    json: {\n      tipo_consulta:parsed.tipo_consulta.trim(),\n      fecha_hora_solicitada: parsed.fecha_hora_solicitada.trim(),\n      resumen: parsed.resumen.trim()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4d16a707-e3c0-4504-a859-7cbde50f340d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appISigz1ruLJNBmJ",
+          "mode": "list",
+          "cachedResultName": "TURNOS PACIENTES",
+          "cachedResultUrl": "https://airtable.com/appISigz1ruLJNBmJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzu0VrqA22Zl8qo",
+          "mode": "list",
+          "cachedResultName": "TURNOS",
+          "cachedResultUrl": "https://airtable.com/appISigz1ruLJNBmJ/tblzu0VrqA22Zl8qo"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre_paciente": "={{ $('Webhook').item.json.body.nombre_paciente }}",
+            "Telefono_paciente": "={{ $('Webhook').item.json.body.telefono_paciente }}",
+            "Mensaje": "={{ $('Webhook').item.json.body.mensaje_original }}",
+            "Tipo_consulta": "={{ $json.tipo_consulta }}",
+            "Fecha_hora_solicitada": "={{ $json.fecha_hora_solicitada }}",
+            "Estado": "=Interpretado por IA",
+            "Canal_contacto": "={{ $('Webhook').item.json.body.canal_contacto }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID_turno",
+              "displayName": "ID_turno",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Nombre_paciente",
+              "displayName": "Nombre_paciente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefono_paciente",
+              "displayName": "Telefono_paciente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Mensaje",
+              "displayName": "Mensaje",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tipo_consulta",
+              "displayName": "Tipo_consulta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Limpieza",
+                  "value": "Limpieza"
+                },
+                {
+                  "name": "Control",
+                  "value": "Control"
+                },
+                {
+                  "name": "Urgencia",
+                  "value": "Urgencia"
+                },
+                {
+                  "name": "Extracción",
+                  "value": "Extracción"
+                },
+                {
+                  "name": "Ortodoncia",
+                  "value": "Ortodoncia"
+                },
+                {
+                  "name": "Blanqueamiento",
+                  "value": "Blanqueamiento"
+                },
+                {
+                  "name": "Otro",
+                  "value": "Otro"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha_hora_solicitada",
+              "displayName": "Fecha_hora_solicitada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha_hora_propuesta",
+              "displayName": "Fecha_hora_propuesta",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Interpretado por IA",
+                  "value": "Interpretado por IA"
+                },
+                {
+                  "name": "Esperando Confirmación Humana",
+                  "value": "Esperando Confirmación Humana"
+                },
+                {
+                  "name": "Confirmado",
+                  "value": "Confirmado"
+                },
+                {
+                  "name": "Rechazado/Reagendar",
+                  "value": "Rechazado/Reagendar"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notas_recepcionista",
+              "displayName": "Notas_recepcionista",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Canal_contacto",
+              "displayName": "Canal_contacto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "WhatsApp",
+                  "value": "WhatsApp"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Creado_el",
+              "displayName": "Creado_el",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "REGISTRO_ERRORES",
+              "displayName": "REGISTRO_ERRORES",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "419bfdf2-f166-4ae8-bc15-4f8ec11d165b",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "4DqrMNRp9aIaHzoD",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "justigil9@gmail.com",
+        "subject": "=Nuevo turno para confirmar - {{ $json.fields.Nombre_paciente }}",
+        "message": "=Hay un turno nuevo interpretado por la IA, esperando tu confirmación:  Paciente: {{ $json.fields.Nombre_paciente }} Tipo de consulta: {{ $json.fields.Tipo_consulta }} Horario solicitado: {{ $json.fields.Fecha_hora_solicitada }} Mensaje original: {{ $json.fields.Mensaje }}  Para confirmar o rechazar este turno, respondé a este correo o actualizá el estado directamente en Airtable.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "6383977a-c60c-4a8e-a687-717d0dffefee",
+      "name": "Send a message",
+      "webhookId": "e0c2f928-7885-4181-8c06-4a4719b6baad",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GQyMQdmfC89n2Auh",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "body": {
+            "nombre_paciente": "Juan Pérez",
+            "telefono_paciente": "+5493511234567",
+            "mensaje_original": "Hola, necesito un turno para una limpieza, tengo disponibilidad los martes a la tarde",
+            "canal_contacto": "WhatsApp"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "5bYDsxx069ggUgkX",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "11aad483-d48c-406e-b967-a50033fb4ed7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1daf19abaaa877e182407f44a4903f1d3ffda224b7840ab7b1413327766dd49a"
+  },
+  "nodeGroups": [],
+  "id": "E0uQsHYWnxU6L6f6",
+  "tags": []
+}

@@ -1,0 +1,194 @@
+{
+  "name": "MANEJO DE ERRORES",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "198ed474-e22e-4072-9e1e-277dd27d5d83",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appISigz1ruLJNBmJ",
+          "mode": "list",
+          "cachedResultName": "TURNOS PACIENTES",
+          "cachedResultUrl": "https://airtable.com/appISigz1ruLJNBmJ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblr8fMCIRQV2Mt6s",
+          "mode": "list",
+          "cachedResultName": "REGISTRO_ERRORES",
+          "cachedResultUrl": "https://airtable.com/appISigz1ruLJNBmJ/tblr8fMCIRQV2Mt6s"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Resuelto": false,
+            "Paso_del_flujo": "=Nodo IA",
+            "Mensaje_error": "={{ $json.execution.error.message }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID_error",
+              "displayName": "ID_error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Fecha_hora",
+              "displayName": "Fecha_hora",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Paso_del_flujo",
+              "displayName": "Paso_del_flujo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nodo IA",
+                  "value": "Nodo IA"
+                },
+                {
+                  "name": "Nodo WhatsApp",
+                  "value": "Nodo WhatsApp"
+                },
+                {
+                  "name": "Chequeo de Disponibilidad",
+                  "value": "Chequeo de Disponibilidad"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Mensaje_error",
+              "displayName": "Mensaje_error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Turno_relacionado",
+              "displayName": "Turno_relacionado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre_paciente (from Turno_relacionado)",
+              "displayName": "Nombre_paciente (from Turno_relacionado)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Estado (from Turno_relacionado)",
+              "displayName": "Estado (from Turno_relacionado)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Resuelto",
+              "displayName": "Resuelto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "80303394-4630-4546-9467-4b36aad4af39",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "4DqrMNRp9aIaHzoD",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "97eafb94-ae39-418c-acce-a0ed2f44e812",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1daf19abaaa877e182407f44a4903f1d3ffda224b7840ab7b1413327766dd49a"
+  },
+  "nodeGroups": [],
+  "id": "5bYDsxx069ggUgkX",
+  "tags": []
+}
