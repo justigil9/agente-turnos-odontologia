@@ -6,3 +6,6 @@ https://airtable.com/appISigz1ruLJNBmJ/shrgKqdSXeGnnveOV
 
 ## Dashboard de Control (vista pública con KPIs)
 https://airtable.com/appISigz1ruLJNBmJ/shrWN155mg0TFUvqm
+
+## Video Demo (3 min)
+https://youtu.be/v6hQWpXmeaA?si=zUztHTlrs0Y52Yvs
